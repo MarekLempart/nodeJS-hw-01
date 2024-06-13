@@ -5,94 +5,81 @@ require("colors");
 const contactsPath = path.join("./db", "contacts.json");
 const contactsDataBase = require("./db/contacts.json");
 
-function parseContacts(data) {
-  return JSON.parse(data.toString());
-}
+const parseContacts = (data) => JSON.parse(data.toString());
 
-function listContacts() {
-  fs.readFile(contactsPath)
-    .then((data) => {
-      return parseContacts(data);
-    })
-    .then((list) => {
-      return [...list].sort((a, b) => {
-        return a.name.localeCompare(b.name);
-      });
-    })
-    .then((result) => console.table(result))
-    .catch((error) => console.log(error.message));
-}
+const listContacts = async () => {
+  try {
+    const data = await fs.readFile(contactsPath);
+    const contacts = parseContacts(data);
+    const sortedContacts = [...contacts].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    console.table(sortedContacts);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-function getContactById(contactId) {
-  fs.readFile(contactsPath)
-    .then((data) => {
-      const contacts = parseContacts(data);
-      return contacts;
-    })
-    .then((contacts) => {
-      const contactsFilter = contacts.filter(
-        (contact) => contact.id === contactId
-      );
-      if (contactsFilter.length > 0) {
-        console.table(contactsFilter);
-        return;
-      }
+const getContactById = async (contactId) => {
+  try {
+    const data = await fs.readFile(contactsPath);
+    const contacts = parseContacts(data);
+    const contact = contacts.filter((contact) => contact.id === contactId);
+
+    if (contacts.length > 0) {
+      console.table(contacts);
+    } else {
       console.log(`There is no contact with the id: ${contactId}.`.red);
-    })
-    .catch((error) => console.log(error.message));
-}
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-function removeContact(contactId) {
-  fs.readFile(contactsPath)
-    .then((data) => {
-      const contacts = parseContacts(data);
-      return contacts;
-    })
-    .then((contacts) => {
-      const contactIndex = contacts.findIndex(
-        (contact) => contact.id === contactId
-      );
-      if (contactIndex !== -1) {
-        contacts.splice(contactIndex, 1);
+const removeContact = async (contactId) => {
+  try {
+    const data = await fs.readFile(contactsPath);
+    const contacts = parseContacts(data);
+    const contactIndex = contacts.findIndex(
+      (contact) => contact.id === contactId
+    );
 
-        fs.writeFile(contactsPath, JSON.stringify(contacts), (error) => {
-          if (error) {
-            console.log(error.message);
-            return;
-          }
-        });
-        console.log(`Contact with the id ${contactId} has been removed.`.green);
-      } else {
-        console.log(`There is no contact with the id: ${contactId}.`.red);
-      }
-    })
-    .catch((error) => console.log(error.message));
-}
+    if (contactIndex !== -1) {
+      contacts.splice(contactIndex, 1);
+      await fs.writeFile(contactsPath, JSON.stringify(contacts));
+      console.log(`Contact with the id ${contactId} has been removed.`.green);
+    } else {
+      console.log(`There is no contact with the id: ${contactId}.`.red);
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-function addContact(name, email, phone) {
+const addContact = async (name, email, phone) => {
+  if (!name || !email || !phone) {
+    console.log("Please set arguments (name, email, phone) to add contact".red);
+    return;
+  }
+
+  const { nanoid } = await import("nanoid");
+
   const contact = {
-    id: (
-      Math.floor(Math.random() * 100000) + contactsDataBase.length
-    ).toString(),
+    id: nanoid(),
     name,
     email,
     phone,
   };
-  if (name === undefined || email === undefined || phone === undefined) {
-    console.log("Please set arguments (name, email, phone) to add contact".red);
-    return;
-  }
-  contactsDataBase.push(contact);
-  const contactsUpdate = JSON.stringify(contactsDataBase);
 
-  fs.writeFile(contactsPath, contactsUpdate, (error) => {
-    if (error) {
-      console.log("Ooops, something went wrong:".red, error.message);
-      return;
-    }
-  });
-  console.log(`${name} has been added to your contacts`.green);
-}
+  contactsDataBase.push(contact);
+
+  try {
+    await fs.writeFile(contactsPath, JSON.stringify(contactsDataBase));
+    console.log(`${name} has been added to your contacts`.green);
+  } catch (error) {
+    console.log("Ooops, something went wrong:".red, error.message);
+  }
+};
 
 module.exports = {
   listContacts,
