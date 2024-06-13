@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-hw-01",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "MarekLempart",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "commander": "^12.1.0",
+    "is-number-object": "^1.0.7",
+    "nodemon": "^3.1.3",
+    "readline": "^1.3.0"
+  }
+}
