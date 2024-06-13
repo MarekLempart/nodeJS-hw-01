@@ -9,8 +9,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "MarekLempart",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarekLempart/nodeJS-hw-01"
+  },
+  "author": "MarekLempart",
+  "homepage": "https://github.com/MarekLempart/nodeJS-hw-01#redme",
   "dependencies": {
     "colors": "^1.4.0",
     "commander": "^12.1.0",
